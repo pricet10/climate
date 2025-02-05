@@ -31,4 +31,20 @@ p3<-p2+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blan
 p3
 ```
 
-![](climateM_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](climateM_files/figure-gfm/unnamed-chunk-1-1.png)<!-- --> now we are
+going to get May-July for each year
+
+``` r
+library(scales)
+troch<-subset(troch, month(data) >=5 & month(data) <=7)
+troch$days<-as.Date(format(troch$data,"%d-%m-2015"),format="%d-%m-%y")
+ggplot(troch, aes(x=days, y=Temperature....C, color=factor(year(data)))) + stat_summary(fun=mean, geom = "line") + scale_x_date(labels = date_format("%b"))
+```
+
+![](climateM_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+ggplot(troch, aes(x=days, y=Temperature....C, color=factor(year(data))))  +stat_summary(fun = function(z) { quantile(z,0.75, na.rm=T) }, geom="line") + scale_x_date(labels = date_format("%b"))
+```
+
+![](climateM_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
