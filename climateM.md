@@ -25,7 +25,7 @@ library(lubridate)
 troch<-read.csv("Troch_camp_2023_2024.csv") #3400m
 data<-as.POSIXlt(troch$Date.Time..IST., tz="Asia/Kolkata", format="%m/%d/%Y %H:%M:%OS")
 troch<-data.frame(troch, data)
-p1<-ggplot(troch, aes(x=data, y=Temperature....C, color=factor(year(data)))) +  geom_line()+scale_color_manual(values=c("black", "black"))
+p1<-ggplot(troch, aes(x=data, y=Temperature....C, color=factor(year(data)))) +  geom_line(show.legend = FALSE)+scale_color_manual(values=c("black", "black"))
 p2<-p1+theme(axis.title = element_text(size = 16)) + ylab(bquote("Hourly temperature"^o*C))+ xlab("Date")
 p3<-p2+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_rect(fill="white"), axis.line = element_line(colour = "black"))
 p3
