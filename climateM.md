@@ -1,13 +1,13 @@
 climateManali
 ================
 Trevor
-2025-02-08
+2025-03-03
 
 ## R Markdown
 
-In this document we are going to do all the climate analyses. First up
-is hobo data from Manali, 2023-2024. Do note we are only using a subset
-for the range 3000-3400m
+In this document we are going to do all the climate analyses, and add
+all the figures. First up is hobo data from Manali, 2023-2024. Do note
+we are only using a subset for the range 3000-3400m
 
 ``` r
 # functionshead(tr)
@@ -72,7 +72,7 @@ grid.arrange(y23, y24, ncol=2)
     ## `geom_smooth()` using formula = 'y ~ x'
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](climateM_files/figure-gfm/Making%20the%20groahs%20of%20lapse%20rate%20for%20supplement-1.png)<!-- -->
+![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20lapse%20rate%20for%20supplement-1.png)<!-- -->
 
 ``` r
 with(y2023, summary(lm(Temperature~day+Elevation)))
@@ -121,3 +121,137 @@ with(y2024, summary(lm(Temperature~day+Elevation)))
     ## Residual standard error: 1.797 on 144 degrees of freedom
     ## Multiple R-squared:  0.1311, Adjusted R-squared:  0.119 
     ## F-statistic: 10.86 on 2 and 144 DF,  p-value: 4.03e-05
+
+``` r
+#Merra2200m<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/climate/datafiles/Manali_Merra2200m.csv")
+#str(Merra2200m)
+Merra3534m<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/climate/datafiles/Kalingcha_Merra3534.csv")
+#for Manali:
+#rainspring<-subset(Merra2200m, (MO==4 & DY>14) | (MO==5 & DY<16))
+#for Kalingcha:
+  rainspring<-subset(Merra3534m, (DOY>104 & DOY<135))
+
+
+rains<-data.frame(tapply(rainspring$PRECTOTCORR, rainspring$YEAR, sum), tapply(rainspring$PRECTOTCORR, rainspring$YEAR, max), tapply(rainspring$PRECTOTCORR, rainspring$YEAR, function(x) sum(x==0)) )
+colnames(rains)<-(c("sum","max","no rain day"))
+
+Temperature<-data.frame(tapply(rainspring$T2M, rainspring$YEAR, mean), tapply(rainspring$T2M, rainspring$YEAR, max), tapply(rainspring$T2M, rainspring$YEAR, min))
+
+colnames(Temperature)<-(c("meanT","maxT","minT"))
+
+Merra<-data.frame(rains, Temperature)
+Merra$Year<-as.numeric(rownames(Merra))
+with(Merra, plot(meanT~Year, type="l", ylab="Daily Mean Temperature", las=1, bty="l"))
+```
+
+![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20Manali%20and%20kalingcha,%20Merra%20data-1.png)<!-- -->
+
+``` r
+with(Merra, plot(sum~Year, type="l", ylab="Precipitation, mm", las=1, bty="l"))
+```
+
+![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20Manali%20and%20kalingcha,%20Merra%20data-2.png)<!-- -->
+
+note: correlation of MerraManali and Kullu over 37 years since 1980 is
+only r = 0.55, MerraKalingcha and Kullu r = 0.6; correlation with
+DelhiSaf is ~r=0.5
+
+``` r
+kullu<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/climate/datafiles/42081_Table_2_Daily_NDCQ-2024-12-221.csv")
+str(kullu)
+```
+
+    ## 'data.frame':    16578 obs. of  40 variables:
+    ##  $ INDEX      : int  42081 42081 42081 42081 42081 42081 42081 42081 42081 42081 ...
+    ##  $ YEAR       : int  1971 1971 1971 1971 1971 1971 1971 1971 1971 1971 ...
+    ##  $ MN         : int  1 1 1 1 1 1 1 1 1 1 ...
+    ##  $ DT         : int  1 2 3 4 5 6 7 8 9 10 ...
+    ##  $ MAX        : num  18.7 15.5 17.4 18.8 18.4 18.3 18.9 20.1 18.2 19.9 ...
+    ##  $ MIN        : num  -3.5 -3.3 -2.8 -2.3 -0.4 -1.4 -2.1 -2.1 -1.6 -0.9 ...
+    ##  $ AW         : int  4 3 3 3 7 6 3 4 3 6 ...
+    ##  $ RF         : num  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ EVP        : num  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ DRNRF.hrs. : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ DRNRF.mnts.: int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ SSH        : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ TS         : logi  NA NA NA NA NA NA ...
+    ##  $ N          : logi  NA NA NA NA NA NA ...
+    ##  $ FFF        : logi  NA NA NA NA NA NA ...
+    ##  $ D          : logi  NA NA NA NA NA NA ...
+    ##  $ TOCSQ      : logi  NA NA NA NA NA NA ...
+    ##  $ DU         : logi  NA NA NA NA NA NA ...
+    ##  $ RA         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ DZ         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ SN         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ SL         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ HA         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ TH         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ DS         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ FG         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ GA         : int  0 0 0 0 0 0 0 0 0 0 ...
+    ##  $ T          : chr  NA NA NA NA ...
+    ##  $ G          : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ DUR        : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ T.1        : chr  NA NA NA NA ...
+    ##  $ G.1        : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ DUR.1      : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ T.2        : chr  NA NA NA NA ...
+    ##  $ G.2        : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ DUR.2      : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ T.3        : chr  NA NA NA NA ...
+    ##  $ G.3        : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ DUR.3      : int  NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ X          : logi  NA NA NA NA NA NA ...
+
+``` r
+kullu<- subset(kullu, (MN==4 & DT>14) | (MN==5 & DT<16))
+
+TotalRain<-tapply(kullu$RF, kullu$YEAR, function(x) sum(x, na.rm=T))
+MeanMaxTemp<- tapply(kullu$MAX, kullu$YEAR, function(x) mean(x, na.rm=T))
+kulludaily<-data.frame(TotalRain, MeanMaxTemp)
+kulludaily$Year<-as.numeric(rownames(kulludaily))
+kulludaily$timeperiod<-cut(kulludaily$Year, c(1970,1993,2019, 2025))
+
+imd_merra<-merge(kulludaily,Merra)
+```
+
+daily rain in June; should repeat for Manali
+
+``` r
+kullu<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/climate/datafiles/42081_Table_2_Daily_NDCQ-2024-12-221.csv")
+kullu<- subset(kullu, MN==6)
+kullu<-subset(kullu, YEAR==2001|YEAR==2003|YEAR==2004|YEAR==2023)
+p1<-ggplot(kullu, aes(x=DT, y=RF, color=factor(YEAR))) + geom_line(show.legend = T) + scale_color_manual(values=c("red", "blue", "purple", "yellow") ) +ggtitle("Rain in June")
+p3<-p1+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_rect(fill="white"), axis.line = element_line(colour = "black"))
+yday(as.Date('2023-06-01',format='%Y-%m-%d'))
+```
+
+    ## [1] 152
+
+Below we make figure of Drent and Daan
+
+``` r
+x <- seq(-3, 3, length=1000)
+y <- dnorm(x, mean=0, sd=1)
+plot(x,y, type="l", ylim=c(0,0.5), xlim=c(-3,3), las=1, bty="l", col="grey", lwd=2, ylab="Relative fitness", xlab="Breeding date")
+yl<-0.05+0.07*x
+yh<-0.2+0.07*x
+lines(x,yl, col="#440154FF")
+lines(x,yh, col="red")
+lines(x,yl*y*3, col="#440154FF", lty=2)
+lines(x,yh*y*3, col="red", lty=2)
+```
+
+![](climateM_files/figure-gfm/Figure%20DrentDaan%20left-1.png)<!-- -->
+
+``` r
+#Drent and Daan right. the linear cuntion is y=ax+b. guassian is standard normal. max is given from differentiation
+computeMax<-function(a,b) (sqrt(4*b*b+a*a)-a)/(2*b)
+library(ggforce)
+avec<-seq(0.02, 0.2, 0.005)
+max<-computeMax(avec, 0.07)
+opt<-data.frame(avec, max)
+p1<-ggplot(opt, aes(x=avec, y=max, color = avec)) + ggforce::geom_link2(lwd=2) + 
+  scale_color_gradient(low = "red", high = "black")+ylim(c(0,1))
+p3<-prettyplot(p1)
+```
