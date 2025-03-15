@@ -1,7 +1,7 @@
 climateManali
 ================
 Trevor
-2025-03-03
+2025-03-15
 
 ## R Markdown
 
@@ -17,7 +17,7 @@ y<-lm(data[,1]~data[,2])$coefficients[2]*x+ lm(data[,1]~data[,2])$coefficients[1
  lines(y~x, col=col, lwd=2)}
 
 prettyplot<-function(p1) {p2<-p1+theme(axis.title = element_text(size = 16)) + ylab(bquote("Mean Temperature "^o*C))+ xlab("Date")
-p3<-p2+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_rect(fill="white"), axis.line = element_line(colour = "black"))
+p3<-p2+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_rect(fill="white"), axis.line = element_line(colour = "black"), legend.position="none")
 return(p3)}
 ```
 
@@ -43,9 +43,9 @@ library(gridExtra)
 #as.Date(x, origin) useful
 troch<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/climate/hobos20232024/hobo2023_2024.csv")
 
-data<-as.POSIXlt(troch$Date.Time..IST., tz="Asia/Kolkata", format="%m/%d/%Y %H:%M:%OS")
-troch<-data.frame(troch, data, floor(as.numeric(julian(data)))-19357, hour(data), year(data), month(data))
-colnames(troch)[c(7,8,9,10)]<-c("Days_Jan1_2023","hours","year","month")
+data<-as.POSIXlt(troch$Date.Time..IST., tz="Asia/Kolkata", format="%m/%d/%Y %H:%M")
+troch<-data.frame(troch, as.Date(104, origin = "2014-01-01"), data, floor(as.numeric(julian(data)))-19357, hour(data), year(data), month(data))
+colnames(troch)[c(7:10)]<-c("Days_Jan1_2023","hours","year","month")
 ```
 
 ``` r
@@ -56,7 +56,7 @@ troch<-subset(troch, elevn_gnd=="3000_1m"|elevn_gnd=="3200_1m"|elevn_gnd=="3400_
 troch$elev<-as.numeric(gsub("_1m","", troch$elevn_gnd))
 # troch<-subset(troch, hours > 19 | hours < 6)#ran with just night temp to confirm robust
 
-dailymeantemp<-aggregate.data.frame(cbind(troch[,c(3,4,11)]), by=list(year(troch$data), yday(troch$data), troch$elevn_gnd), mean)
+dailymeantemp<-aggregate.data.frame(cbind(troch[,c(2,3,10)]), by=list(year(troch$data), yday(troch$data), troch$elevn_gnd), mean)
 colnames(dailymeantemp)<-c("Year", "day", "Location","Temperature", "Light", "Elevation")
 
 y2023<-subset(dailymeantemp, Year==2023)
@@ -84,19 +84,19 @@ with(y2023, summary(lm(Temperature~day+Elevation)))
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -6.4679 -2.1510  0.0558  2.2151  6.3947 
+    ## -6.7636 -2.1423  0.1281  2.2066  6.4163 
     ## 
     ## Coefficients:
-    ##              Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)  2.860639   5.709662   0.501   0.6171    
-    ## day          0.121712   0.018115   6.719 4.25e-10 ***
-    ## Elevation   -0.003366   0.001529  -2.201   0.0294 *  
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  -7.4714     3.0657  -2.437   0.0161 *  
+    ## day           0.1381     0.0336   4.110 6.71e-05 ***
+    ## Elevation    -0.5378     0.9574  -0.562   0.5752    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 2.981 on 140 degrees of freedom
-    ## Multiple R-squared:  0.2648, Adjusted R-squared:  0.2543 
-    ## F-statistic: 25.22 on 2 and 140 DF,  p-value: 4.43e-10
+    ## Residual standard error: 3.028 on 140 degrees of freedom
+    ## Multiple R-squared:  0.2411, Adjusted R-squared:  0.2303 
+    ## F-statistic: 22.24 on 2 and 140 DF,  p-value: 4.096e-09
 
 ``` r
 with(y2024, summary(lm(Temperature~day+Elevation)))
@@ -108,19 +108,19 @@ with(y2024, summary(lm(Temperature~day+Elevation)))
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -5.5877 -1.0642  0.3053  1.3072  3.6746 
+    ## -6.4160 -0.9316  0.2909  1.1796  3.6284 
     ## 
     ## Coefficients:
-    ##               Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept) 22.6567283  3.3464699   6.770 3.02e-10 ***
-    ## day          0.0197499  0.0104801   1.885   0.0615 .  
-    ## Elevation   -0.0038696  0.0009076  -4.264 3.62e-05 ***
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 12.80453    1.75339   7.303 1.76e-11 ***
+    ## day          0.09209    0.01947   4.729 5.33e-06 ***
+    ## Elevation   -2.48751    0.56524  -4.401 2.09e-05 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 1.797 on 144 degrees of freedom
-    ## Multiple R-squared:  0.1311, Adjusted R-squared:  0.119 
-    ## F-statistic: 10.86 on 2 and 144 DF,  p-value: 4.03e-05
+    ## Residual standard error: 1.79 on 144 degrees of freedom
+    ## Multiple R-squared:  0.1374, Adjusted R-squared:  0.1255 
+    ## F-statistic: 11.47 on 2 and 144 DF,  p-value: 2.382e-05
 
 ``` r
 #Merra2200m<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/climate/datafiles/Manali_Merra2200m.csv")
@@ -144,13 +144,13 @@ Merra$Year<-as.numeric(rownames(Merra))
 with(Merra, plot(meanT~Year, type="l", ylab="Daily Mean Temperature", las=1, bty="l"))
 ```
 
-![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20Manali%20and%20kalingcha,%20Merra%20data-1.png)<!-- -->
+![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20Manali%20and%20Kalingcha,%20Merra%20data-1.png)<!-- -->
 
 ``` r
 with(Merra, plot(sum~Year, type="l", ylab="Precipitation, mm", las=1, bty="l"))
 ```
 
-![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20Manali%20and%20kalingcha,%20Merra%20data-2.png)<!-- -->
+![](climateM_files/figure-gfm/Making%20the%20graphs%20of%20Manali%20and%20Kalingcha,%20Merra%20data-2.png)<!-- -->
 
 note: correlation of MerraManali and Kullu over 37 years since 1980 is
 only r = 0.55, MerraKalingcha and Kullu r = 0.6; correlation with
@@ -245,7 +245,7 @@ lines(x,yh*y*3, col="red", lty=2)
 ![](climateM_files/figure-gfm/Figure%20DrentDaan%20left-1.png)<!-- -->
 
 ``` r
-#Drent and Daan right. the linear cuntion is y=ax+b. guassian is standard normal. max is given from differentiation
+#Drent and Daan right. the linear function is y=ax+b. guassian is standard normal. max is given from differentiation
 computeMax<-function(a,b) (sqrt(4*b*b+a*a)-a)/(2*b)
 library(ggforce)
 avec<-seq(0.02, 0.2, 0.005)
@@ -254,4 +254,16 @@ opt<-data.frame(avec, max)
 p1<-ggplot(opt, aes(x=avec, y=max, color = avec)) + ggforce::geom_link2(lwd=2) + 
   scale_color_gradient(low = "red", high = "black")+ylim(c(0,1))
 p3<-prettyplot(p1)
+```
+
+``` r
+ computemeans<-function(x,y) sum(x*y)/sum(y)
+cl<-read.csv("~/Desktop/current does/currentpapersgrants/elevationPaper2024/presentationUBC/humeiclutchkashmir.csv")
+day_in_year<-yday(as.Date(cl$averagelay.date,format='%m/%d/%Y'))
+year<-year(as.Date(cl$averagelay.date,format='%m/%d/%Y'))
+cl<-data.frame(cl,day_in_year, year)
+
+p1<-ggplot(cl, aes(x=day_in_year, y=clutch.size, color=factor(year))) +geom_jitter(cex=cl$numbers/5, width=0.5, height=0)
+#avgday<-sapply(cl, function(x) computemeans(x[,4], x[,3]))
+#avgclutch<-sapply(cl, function(x) computemeans(x[,1], x[,3]))
 ```
